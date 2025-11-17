@@ -1,0 +1,16 @@
+-- Chama a função InserirDadosAleatoriosRobustosComResultado()
+-- Essa função foi definida anteriormente para inserir dados aleatórios
+-- nas tabelas do esquema Financeiro (Clientes, Transacoes, Ativos, Passivos, DemonstracaoFinanceira).
+
+-- Quando você executa essa linha:
+SELECT InserirDadosAleatoriosRobustosComResultado();
+
+-- O que acontece é:
+-- 1. O PostgreSQL executa o corpo da função.
+-- 2. A função insere os dados (conforme o código da função).
+-- 3. No final, a função retorna um INT (RowCount),
+--    que representa o total de linhas na tabela Financeiro.Clientes após as inserções.
+-- 4. O SELECT exibe esse valor retornado como resultado da consulta.
+
+-- Comentário "3000 registros inseridos" é apenas uma anotação sua indicando
+-- que a intenção é que a função insira 3000 registros.
