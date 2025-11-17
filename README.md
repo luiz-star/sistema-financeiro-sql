@@ -117,3 +117,22 @@ GROUP BY c.id_conta, cli.nome_cliente, c.numero_conta, c.agencia, c.tipo_conta
 ORDER BY saldo_atual DESC;
 ````
 
+## Organização dos arquivos
+* schema.sql
+Criação de schema, tabelas, índices e categorias padrão.
+
+* seed_function.sql
+Função PL/pgSQL parametrizável para gerar massa de dados de teste.
+
+* queries-exemplos.sql
+Consultas SQL para análise e demonstração (arquivo sugerido).
+
+## Próximos passos
+Ideias de evolução:
+
+* Criar views analíticas (fatos e dimensões) para cenários de BI.
+* Adicionar novas categorias de transação e cenários de teste.
+* Incluir scripts de benchmark para comparar índices e estratégias de consulta.
+  
+## Licença
+Projeto disponibilizado para fins de estudo, demonstração e portfólio.
