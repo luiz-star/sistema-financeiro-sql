@@ -1,3 +1,8 @@
+
+
+<img width="1024" height="1024" alt="Sistema_Financeiro_em_SQL_PostgreSQL_PL_pgSQL_" src="https://github.com/user-attachments/assets/49675046-f76c-4dd8-8ca6-146e7d9ca84e" />
+
+
 # Sistema Financeiro em SQL
 
 Modelagem e implementação de um pequeno **sistema financeiro** em SQL, com foco em:
