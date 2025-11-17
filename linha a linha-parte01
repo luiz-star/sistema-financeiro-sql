@@ -1,0 +1,62 @@
+```sql
+
+-- Criar um esquema chamado 'Financeiro'
+-- O esquema (SCHEMA) é como um "agrupador" lógico de tabelas dentro do banco.
+-- Em alguns SGBDs (como SQL Server / PostgreSQL) isso organiza melhor as tabelas.
+CREATE SCHEMA Financeiro;
+
+-- Criar tabelas dentro do esquema 'Financeiro'
+-- A partir daqui, todas as tabelas serão criadas dentro do esquema Financeiro (Financeiro.NomeDaTabela)
+
+-- Cria a tabela de clientes
+CREATE TABLE Financeiro.Clientes (
+    ClienteID INT PRIMARY KEY,   -- Coluna 'ClienteID' do tipo inteiro. PRIMARY KEY = identificador único de cada cliente.
+    Nome VARCHAR(50),            -- Coluna 'Nome' com até 50 caracteres de texto.
+    Email VARCHAR(50),           -- Coluna 'Email' com até 50 caracteres.
+    Telefone VARCHAR(15)         -- Coluna 'Telefone' com até 15 caracteres (pode armazenar DDD + número).
+);
+
+-- Cria a tabela de transações financeiras
+CREATE TABLE Financeiro.Transacoes (
+    TransacaoID INT PRIMARY KEY,      -- Identificador único de cada transação.
+    ClienteID INT,                    -- Coluna que guarda o ID do cliente relacionado à transação.
+    DataTransacao DATE,               -- Data em que a transação aconteceu (tipo DATE).
+    Valor DECIMAL(10, 2),             -- Valor da transação, com até 10 dígitos no total e 2 casas decimais.
+    TipoTransacao VARCHAR(10),        -- Tipo da transação (ex: 'Crédito', 'Débito', 'Pix', etc.), até 10 caracteres.
+    FOREIGN KEY (ClienteID) REFERENCES Financeiro.Clientes(ClienteID)
+    -- FOREIGN KEY: define que 'ClienteID' nesta tabela deve existir na tabela Financeiro.Clientes.
+    -- Ou seja, só pode registrar transações de clientes que existam na tabela Clientes.
+);
+
+-- Cria a tabela de ativos financeiros
+CREATE TABLE Financeiro.Ativos (
+    AtivoID INT PRIMARY KEY,          -- Identificador único de cada ativo.
+    ClienteID INT,                    -- Cliente ao qual esse ativo pertence.
+    NomeAtivo VARCHAR(50),            -- Nome do ativo (ex: 'Ação XYZ', 'CDB Banco X'), até 50 caracteres.
+    ValorAtual DECIMAL(10, 2),        -- Valor atual do ativo, com 2 casas decimais.
+    FOREIGN KEY (ClienteID) REFERENCES Financeiro.Clientes(ClienteID)
+    -- Garante que o ClienteID informado exista em Financeiro.Clientes.
+);
+
+-- Cria a tabela de passivos (dívidas, obrigações)
+CREATE TABLE Financeiro.Passivos (
+    PassivoID INT PRIMARY KEY,        -- Identificador único de cada passivo.
+    ClienteID INT,                    -- Cliente ao qual esse passivo pertence.
+    NomePassivo VARCHAR(50),          -- Descrição do passivo (ex: 'Empréstimo Banco X'), até 50 caracteres.
+    ValorAtual DECIMAL(10, 2),        -- Valor atual do passivo.
+    FOREIGN KEY (ClienteID) REFERENCES Financeiro.Clientes(ClienteID)
+    -- Chave estrangeira para garantir vínculo com um cliente existente.
+);
+
+-- Cria a tabela de demonstração financeira (resumo de resultados do cliente)
+CREATE TABLE Financeiro.DemonstracaoFinanceira (
+    DemonstracaoID INT PRIMARY KEY,   -- Identificador único de cada demonstração financeira.
+    ClienteID INT,                    -- Cliente ao qual essa demonstração se refere.
+    Receitas DECIMAL(10, 2),          -- Total de receitas (ganhos) do cliente nesse período.
+    Despesas DECIMAL(10, 2),          -- Total de despesas (gastos) do cliente nesse período.
+    LucroPrejuizo DECIMAL(10, 2),     -- Resultado final (Receitas - Despesas). Pode ser lucro (positivo) ou prejuízo (negativo).
+    FOREIGN KEY (ClienteID) REFERENCES Financeiro.Clientes(ClienteID)
+    -- Garante que a demonstração financeira sempre esteja associada a um cliente válido.
+);
+
+```
