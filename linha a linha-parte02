@@ -1,0 +1,83 @@
+-- Cria ou substitui (se já existir) uma função chamada InserirDadosAleatoriosRobustosComResultado
+-- Essa função vai retornar um inteiro (INT) e é escrita em PL/pgSQL (PostgreSQL).
+CREATE OR REPLACE FUNCTION InserirDadosAleatoriosRobustosComResultado()
+RETURNS INT                         -- Tipo de retorno da função: um número inteiro
+LANGUAGE plpgsql                    -- Linguagem da função: PL/pgSQL
+AS $$
+DECLARE
+    RowCount INT;                   -- Declara uma variável local chamada RowCount, do tipo inteiro
+BEGIN
+    RowCount := 0;                  -- Inicializa RowCount com 0
+
+    -- Loop que continua enquanto a contagem de linhas na tabela Clientes for menor que 3000
+    WHILE RowCount < 3000 LOOP
+
+        -- Inserir dados aleatórios na tabela de Clientes
+        INSERT INTO Financeiro.Clientes (ClienteID, Nome, Email, Telefone)
+        SELECT 
+            spt.Number,                                     -- ClienteID: número da série (1 a 3000)
+            'Cliente' || spt.Number,                        -- Nome: 'Cliente1', 'Cliente2', ...
+            'cliente' || spt.Number || '@email.com',        -- Email: 'cliente1@email.com', ...
+            '123-456-7890'                                  -- Telefone fixo (mesmo para todos)
+        FROM generate_series(1, 3000) spt(Number)           -- Gera números de 1 a 3000 (aliás spt com coluna Number)
+        WHERE spt.Number BETWEEN 1 AND 3000;                -- Filtro redundante (já é 1 a 3000)
+
+        -- OBS IMPORTANTE:
+        -- Esse INSERT tenta inserir SEMPRE os mesmos IDs (1 a 3000).
+        -- Se a função for executada mais de uma vez, vai dar erro de chave primária duplicada.
+
+        -- Inserir dados aleatórios na tabela de Transacoes
+        INSERT INTO Financeiro.Transacoes (TransacaoID, ClienteID, DataTransacao, Valor, TipoTransacao)
+        SELECT 
+            spt.Number,                                     -- TransacaoID: igual ao número da série (1 a 3000)
+            spt.Number,                                     -- ClienteID: igual ao mesmo número (associa cliente = transação)
+            CURRENT_DATE,                                   -- DataTransacao: data atual do servidor
+            floor(random() * 1000)::integer,                -- Valor: número aleatório entre 0 e 999 (inteiro)
+            'Compra'                                        -- TipoTransacao: texto fixo 'Compra'
+        FROM generate_series(1, 3000) spt(Number)
+        WHERE spt.Number BETWEEN 1 AND 3000;
+
+        -- Inserir dados aleatórios na tabela de Ativos
+        INSERT INTO Financeiro.Ativos (AtivoID, ClienteID, NomeAtivo, ValorAtual)
+        SELECT
+            spt.Number,                                     -- AtivoID: 1 a 3000
+            spt.Number,                                     -- ClienteID: mesmo número - cada cliente recebe um ativo com mesmo ID
+            'Ativo' || spt.Number,                          -- NomeAtivo: 'Ativo1', 'Ativo2', ...
+            floor(random() * 10000)::integer                -- ValorAtual: número aleatório entre 0 e 9999 (inteiro)
+        FROM generate_series(1, 3000) spt(Number)
+        WHERE spt.Number BETWEEN 1 AND 3000;
+
+        -- Inserir dados aleatórios na tabela de Passivos
+        INSERT INTO Financeiro.Passivos (PassivoID, ClienteID, NomePassivo, ValorAtual)
+        SELECT
+            spt.Number,                                     -- PassivoID: 1 a 3000
+            spt.Number,                                     -- ClienteID: mesmo número
+            'Passivo' || spt.Number,                        -- NomePassivo: 'Passivo1', 'Passivo2', ...
+            floor(random() * 5000)::integer                 -- ValorAtual: número aleatório entre 0 e 4999 (inteiro)
+        FROM generate_series(1, 3000) spt(Number)
+        WHERE spt.Number BETWEEN 1 AND 3000;
+
+        -- Inserir dados aleatórios na tabela de DemonstracaoFinanceira
+        INSERT INTO Financeiro.DemonstracaoFinanceira 
+            (DemonstracaoID, ClienteID, Receitas, Despesas, LucroPrejuizo)
+        SELECT
+            spt.Number,                                     -- DemonstracaoID: 1 a 3000
+            spt.Number,                                     -- ClienteID: mesmo número
+            floor(random() * 5000)::integer,                -- Receitas: aleatório 0 a 4999
+            floor(random() * 5000)::integer,                -- Despesas: aleatório 0 a 4999
+            NULL                                            -- LucroPrejuizo: começa como NULL (não calculado ainda)
+        FROM generate_series(1, 3000) spt(Number)
+        WHERE spt.Number BETWEEN 1 AND 3000;
+
+        -- Atualiza RowCount com a quantidade de linhas na tabela Clientes
+        SELECT COUNT(*) INTO RowCount FROM Financeiro.Clientes;
+        -- Depois desse SELECT, RowCount passa a ter o total de registros em Financeiro.Clientes.
+        -- Como cada execução do bloco insere 3000 clientes (IDs 1 a 3000),
+        -- normalmente, na primeira execução o COUNT já vai ser 3000 (ou vai falhar se já existirem registros).
+
+    END LOOP;  -- Fim do WHILE RowCount < 3000
+
+    -- Retornar o número total de linhas na tabela de Clientes
+    RETURN RowCount;                -- A função devolve quantos clientes existem após as inserções
+END;
+$$;
